@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PreWorld Review 状态 · Status</title>
+<meta name="description" content="PreWorld Review 平台和文档站是否正常，最近 90 天的可用率和故障记录。Whether PreWorld Review and its docs are up; uptime over 90 days and incidents.">
+<style>
+  :root {
+    --bg: #f6f7f5; --panel: #ffffff; --ink: #1d2320; --muted: #66706b; --line: #e2e6e3;
+    --up: #2f8f5b; --down: #c2412d; --partial: #d49a2a; --none: #d9ddd9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111513; --panel: #181d1a; --ink: #e8ece9; --muted: #98a29c; --line: #2a312d; --up: #45b07a; --down: #e0654f; --partial: #e2b04a; --none: #2d3430; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 -apple-system, "PingFang SC", "Hiragino Sans GB", "Segoe UI", Roboto, "Noto Sans SC", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; letter-spacing: .01em; }
+  .en { color: var(--muted); font-weight: 400; }
+  .banner { margin: 20px 0 28px; padding: 18px 20px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); display: flex; gap: 12px; align-items: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--none); }
+  .dot.up { background: var(--up); } .dot.down { background: var(--down); }
+  .banner strong { font-size: 17px; }
+  section.check { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .name { font-weight: 600; display: flex; gap: 10px; align-items: center; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .bars { display: grid; grid-template-columns: repeat(90, 1fr); gap: 2px; margin: 14px 0 6px; height: 30px; }
+  .bars i { border-radius: 2px; background: var(--none); }
+  .bars i.up { background: var(--up); } .bars i.partial { background: var(--partial); } .bars i.down { background: var(--down); }
+  .scale { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+  h2 { font-size: 15px; margin: 32px 0 10px; }
+  ul.incidents { list-style: none; padding: 0; margin: 0; }
+  ul.incidents li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  ul.incidents li:first-child { border-top: 0; }
+  a { color: inherit; }
+  footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
+  .tip { position: relative; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>PreWorld Review 状态 <span class="en">Status</span></h1>
+    <span class="meta" id="updated">正在读取… Loading…</span>
+  </header>
+  <div class="banner" id="banner"><span class="dot"></span><strong>正在读取最新检查结果 · Loading the latest checks</strong></div>
+  <div id="checks"></div>
+  <h2>最近的故障 <span class="en">Recent incidents</span></h2>
+  <ul class="incidents" id="incidents"><li class="meta">没有记录 · None recorded</li></ul>
+  <footer>
+    每 5 分钟从 GitHub 检查一次 <a href="https://review.nice2.io/healthz">/healthz</a> 和文档站，连续两次没通过才算故障。Checked every 5 minutes from GitHub; two failures in a row count as an outage.
+    · <a href="https://review.nice2.io/docs/">文档 Docs</a> · <a href="https://github.com/WorldMind-Tech/status">数据与记录 Data</a>
+  </footer>
+</main>
+<script>
+const SRC = 'https://raw.githubusercontent.com/WorldMind-Tech/status/main/data/status.json';
+const el = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const fmt = (iso) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '');
+const dur = (a, b) => { const m = Math.max(1, Math.round((new Date(b || Date.now()) - new Date(a)) / 60000)); return m < 60 ? `${m} 分钟 min` : `${Math.floor(m / 60)} 小时 h ${m % 60} 分钟 min`; };
+function days90() { const out = []; const d = new Date(); d.setUTCHours(0, 0, 0, 0); for (let i = 89; i >= 0; i--) out.push(new Date(d - i * 864e5).toISOString().slice(0, 10)); return out; }
+function render(data) {
+  const checks = data.checks || [], state = data.state || {}, days = data.days || {};
+  const down = checks.filter((c) => state[c.id]?.status === 'down');
+  el('banner').innerHTML = down.length
+    ? `<span class="dot down"></span><strong>${esc(down.map((c) => c.name).join('、'))} 不可用 · ${down.length > 1 ? 'Some services are' : 'A service is'} down</strong>`
+    : `<span class="dot up"></span><strong>全部正常 · All systems operational</strong>`;
+  el('updated').textContent = `最后检查 Last checked ${fmt(data.updated)}`;
+  el('checks').innerHTML = checks.map((c) => {
+    const s = state[c.id] || {};
+    let ok = 0, total = 0;
+    const bars = days90().map((d) => { const v = days[d]?.[c.id]; if (!v) return `<i title="${d}：没有数据 no data"></i>`; ok += v[0]; total += v[1]; const r = v[0] / v[1]; return `<i class="${r >= 0.999 ? 'up' : r >= 0.95 ? 'partial' : 'down'}" title="${d}：${(r * 100).toFixed(2)}%"></i>`; }).join('');
+    const pct = total ? `${((ok / total) * 100).toFixed(2)}%` : '—';
+    return `<section class="check"><div class="row"><span class="name"><span class="dot ${s.status === 'down' ? 'down' : s.status ? 'up' : ''}"></span>${esc(c.name)}</span>
+      <span class="meta">${s.status === 'down' ? `不可用 Down · 从 since ${fmt(s.since)}` : s.last_ms != null ? `正常 Up · ${s.last_ms} ms` : ''}</span></div>
+      <div class="bars">${bars}</div><div class="scale"><span>90 天前 90 days ago</span><span>可用率 Uptime ${pct}</span><span>今天 Today</span></div></section>`;
+  }).join('');
+  const inc = (data.incidents || []).slice().reverse().slice(0, 10);
+  if (inc.length) el('incidents').innerHTML = inc.map((i) => {
+    const name = checks.find((c) => c.id === i.check)?.name || i.check;
+    const link = i.issue ? ` · <a href="https://github.com/WorldMind-Tech/status/issues/${i.issue}">#${i.issue}</a>` : '';
+    return `<li><strong>${esc(name)}</strong> ${i.end ? `不可用 ${dur(i.start, i.end)} · down for ${dur(i.start, i.end)}` : '正在处理 · ongoing'}<br><span class="meta">${fmt(i.start)}${i.end ? ` – ${fmt(i.end)}` : ''}${i.detail ? ` · ${esc(i.detail)}` : ''}${link}</span></li>`;
+  }).join('');
+}
+fetch(`${SRC}?t=${Date.now()}`, { cache: 'no-store' }).then((r) => r.json()).then(render).catch(() => {
+  el('banner').innerHTML = '<span class="dot"></span><strong>暂时读不到检查结果 · The latest checks could not be loaded</strong>';
+  el('updated').textContent = '';
+});
+</script>
+</body>
+</html>
