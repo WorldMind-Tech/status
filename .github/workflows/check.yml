@@ -1,16 +1,23 @@
-# Every 15 minutes, off the hour (GitHub delays or drops schedules at busy times, the top of the hour most): check the platform and the docs, keep the result in data/status.json, open or close the incident issue.
+# Check the platform and the docs every 15 minutes, keep the result in data/status.json, open or close the incident issue.
+#
+# GitHub never started this repository's schedule (created 2026-09-30; not a fork, Actions on, re-enabling did not help), so a run
+# does not end after one check: it checks every 15 minutes for about 5½ hours, then starts the next run itself (workflow_dispatch
+# is the one event the workflow's own token may start). One run at a time: the concurrency group keeps at most one waiting behind
+# the running one. The hourly schedule stays as a way back if the chain ever stops and GitHub's schedule starts working; by hand:
+# `gh workflow run check.yml --repo WorldMind-Tech/status`.
 # Commits made with the workflow's own token do not start other workflows, so the page is not redeployed for them: it reads
 # data/status.json straight from the repository.
 name: check
 
 on:
   schedule:
-    - cron: "3,18,33,48 * * * *"
+    - cron: "7 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
   issues: write
+  actions: write
 
 concurrency:
   group: check
@@ -19,20 +26,28 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v7
-      - name: Check
+      - name: Check every 15 minutes
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-        run: python3 status.py
-      - name: Save the result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/status.json
-          git diff --cached --quiet && exit 0
-          git commit -q -m "check $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git push -q && exit 0; git pull -q --rebase; done
-          exit 1
+          for round in $(seq 1 22); do
+            git pull -q --rebase || true
+            python3 status.py || echo "check failed in round $round"
+            git add data/status.json
+            if ! git diff --cached --quiet; then
+              git commit -q -m "check $(date -u +%Y-%m-%dT%H:%MZ)"
+              for i in 1 2 3; do git push -q && break; git pull -q --rebase; done
+            fi
+            [ "$round" -lt 22 ] && sleep 900
+          done
+      - name: Start the next run
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run check.yml --repo "${{ github.repository }}" --ref main
