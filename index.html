@@ -65,9 +65,13 @@ function days90() { const out = []; const d = new Date(); d.setUTCHours(0, 0, 0,
 function render(data) {
   const checks = data.checks || [], state = data.state || {}, days = data.days || {};
   const down = checks.filter((c) => state[c.id]?.status === 'down');
+  // checks run every 15 minutes: an older result says nothing about now, so it is not shown as "operational"
+  const stale = !data.updated || Date.now() - new Date(data.updated) > 45 * 60000;
   el('banner').innerHTML = down.length
     ? `<span class="dot down"></span><strong>${esc(down.map((c) => c.name).join('、'))} 不可用 · ${down.length > 1 ? 'Some services are' : 'A service is'} down</strong>`
-    : `<span class="dot up"></span><strong>全部正常 · All systems operational</strong>`;
+    : stale
+      ? `<span class="dot"></span><strong>检查结果过期了（${dur(data.updated)}前）· The latest check is ${dur(data.updated)} old</strong>`
+      : `<span class="dot up"></span><strong>全部正常 · All systems operational</strong>`;
   el('updated').textContent = `最后检查 Last checked ${fmt(data.updated)}`;
   el('checks').innerHTML = checks.map((c) => {
     const s = state[c.id] || {};
