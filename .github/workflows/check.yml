@@ -1,11 +1,11 @@
-# Every 5 minutes: check the platform and the docs, keep the result in data/status.json, open or close the incident issue.
+# Every 15 minutes, off the hour (GitHub delays or drops schedules at busy times, the top of the hour most): check the platform and the docs, keep the result in data/status.json, open or close the incident issue.
 # Commits made with the workflow's own token do not start other workflows, so the page is not redeployed for them: it reads
 # data/status.json straight from the repository.
 name: check
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "3,18,33,48 * * * *"
   workflow_dispatch:
 
 permissions:

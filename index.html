@@ -51,7 +51,7 @@
   <h2>最近的故障 <span class="en">Recent incidents</span></h2>
   <ul class="incidents" id="incidents"><li class="meta">没有记录 · None recorded</li></ul>
   <footer>
-    每 5 分钟从 GitHub 检查一次 <a href="https://review.nice2.io/healthz">/healthz</a> 和文档站，连续两次没通过才算故障。Checked every 5 minutes from GitHub; two failures in a row count as an outage.
+    由 GitHub 定时检查 <a href="https://review.nice2.io/healthz">/healthz</a> 和文档站，一般每 15 分钟一次（GitHub 繁忙时会晚），连续两次没通过才算故障；平台自己的故障告警另在 Google Cloud 上，按分钟检查。Checked from GitHub about every 15 minutes (later when GitHub is busy); two failures in a row count as an outage. The platform's own alerting runs separately on Google Cloud, every minute.
     · <a href="https://review.nice2.io/docs/">文档 Docs</a> · <a href="https://github.com/WorldMind-Tech/status">数据与记录 Data</a>
   </footer>
 </main>
