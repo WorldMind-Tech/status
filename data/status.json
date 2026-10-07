@@ -84,12 +84,12 @@
   },
   "2026-10-07": {
    "app": [
-    25,
-    25
+    26,
+    26
    ],
    "docs": [
-    25,
-    25
+    26,
+    26
    ]
   }
  },
@@ -98,21 +98,21 @@
   "app": {
    "fails": 0,
    "first_fail": null,
-   "last_checked": "2026-10-07T05:56:55Z",
+   "last_checked": "2026-10-07T06:11:57Z",
    "last_error": null,
-   "last_ms": 558,
+   "last_ms": 477,
    "since": "2026-09-30T11:20:54Z",
    "status": "up"
   },
   "docs": {
    "fails": 0,
    "first_fail": null,
-   "last_checked": "2026-10-07T05:56:55Z",
+   "last_checked": "2026-10-07T06:11:57Z",
    "last_error": null,
-   "last_ms": 451,
+   "last_ms": 647,
    "since": "2026-09-30T11:20:54Z",
    "status": "up"
   }
  },
- "updated": "2026-10-07T05:56:55Z"
+ "updated": "2026-10-07T06:11:57Z"
 }
