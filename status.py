@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One round of checks for the PreWorld Review status page (run every 5 minutes by .github/workflows/check.yml).
+"""One round of checks for the Yi Eval status page (run every 5 minutes by .github/workflows/check.yml).
 
 Probes each public endpoint, updates data/status.json (current state, per-day counts for 90 days, the last 50 incidents) and
 opens or closes the incident issue. A check counts as down after two failing rounds in a row, so one network blip is not an

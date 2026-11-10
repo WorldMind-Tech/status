@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PreWorld Review 状态 · Status</title>
-<meta name="description" content="PreWorld Review 平台和文档站是否正常，最近 90 天的可用率和故障记录。Whether PreWorld Review and its docs are up; uptime over 90 days and incidents.">
+<title>Yi Eval 状态 · Status</title>
+<meta name="description" content="Yi Eval 平台和文档站是否正常，最近 90 天的可用率和故障记录。Whether Yi Eval and its docs are up; uptime over 90 days and incidents.">
 <style>
   :root {
     --bg: #f6f7f5; --panel: #ffffff; --ink: #1d2320; --muted: #66706b; --line: #e2e6e3;
@@ -43,7 +43,7 @@
 <body>
 <main>
   <header>
-    <h1>PreWorld Review 状态 <span class="en">Status</span></h1>
+    <h1>Yi Eval 状态 <span class="en">Status</span></h1>
     <span class="meta" id="updated">正在读取… Loading…</span>
   </header>
   <div class="banner" id="banner"><span class="dot"></span><strong>正在读取最新检查结果 · Loading the latest checks</strong></div>
@@ -51,7 +51,7 @@
   <h2>最近的故障 <span class="en">Recent incidents</span></h2>
   <ul class="incidents" id="incidents"><li class="meta">没有记录 · None recorded</li></ul>
   <footer>
-    由 GitHub 定时检查 <a href="https://review.nice2.io/healthz">/healthz</a> 和文档站，一般每 15 分钟一次（GitHub 繁忙时会晚），连续两次没通过才算故障；平台自己的故障告警另在 Google Cloud 上，按分钟检查。Checked from GitHub about every 15 minutes (later when GitHub is busy); two failures in a row count as an outage. The platform's own alerting runs separately on Google Cloud, every minute.
+    由 GitHub 定时检查 <a href="https://review.nice2.io/healthz">/healthz</a> 和文档站，一般每 15 分钟一次（GitHub 繁忙时会晚），连续两次没通过才算故障；平台自己的故障告警另外运行，按分钟检查。Checked from GitHub about every 15 minutes (later when GitHub is busy); two failures in a row count as an outage. The platform's own alerting runs separately, every minute.
     · <a href="https://review.nice2.io/docs/">文档 Docs</a> · <a href="https://github.com/WorldMind-Tech/status">数据与记录 Data</a>
   </footer>
 </main>

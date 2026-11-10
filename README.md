@@ -1,6 +1,6 @@
-# PreWorld Review status
+# Yi Eval status
 
-Public status page for [PreWorld Review](https://review.nice2.io): https://worldmind-tech.github.io/status/
+Public status page for [Yi Eval](https://review.nice2.io): https://worldmind-tech.github.io/status/
 
 - About every 15 minutes (GitHub runs schedules late, or drops them, when it is busy), [`check.yml`](.github/workflows/check.yml) runs [`status.py`](status.py), which requests
   `https://review.nice2.io/healthz` and `https://review.nice2.io/docs/` (three tries, 10 s apart) and writes the result to
